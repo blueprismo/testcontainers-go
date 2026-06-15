@@ -246,11 +246,14 @@ func (c *K3sContainer) LoadImagesWithPlatform(ctx context.Context, images []stri
 	if err != nil {
 		return fmt.Errorf("creating temporary images file %w", err)
 	}
+	if err = imagesTar.Close(); err != nil {
+		return fmt.Errorf("close temporary images file: %w", err)
+	}
 	defer func() {
 		_ = os.Remove(imagesTar.Name())
 	}()
 
-	err = provider.SaveImagesWithOpts(context.Background(), imagesTar.Name(), images, opts...)
+	err = provider.SaveImagesWithOpts(ctx, imagesTar.Name(), images, opts...)
 	if err != nil {
 		return fmt.Errorf("saving images %w", err)
 	}
